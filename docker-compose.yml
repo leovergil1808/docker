@@ -1,0 +1,65 @@
+version: "3"
+services:
+  db:
+    build: ./mysql
+    hostname: db
+    command:
+      - --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: "phanquan1808"
+      TZ: Asia/Tokyo
+    volumes:
+      # conf
+      - ./mysql/conf/my.cnf:/etc/my.cnf                                           # Thư mục chứa mysql config
+      # data
+      - ./mysql/data:/var/lib/mysql                                               # Lưu db                
+      - ./mysql/ibdata:/data/mysql                                                # Lưu db 
+      - ./mysql/init:/data/init                                                   # Path chứa seeder
+      # init
+      #- ./mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
+  web:
+    build: ./web                                                                 # Đường dẫn chứa Dockerfile
+    privileged: true
+    ports:
+      - "8888:8888"
+    volumes:
+      # source
+      - ./htdocs/:/var/www/html                                                  # Thư mục chứ source mặc định của apache
+      # - ./htdocs/:/data/mo2/www                                                  # Thư mục chứa source custom
+
+      # logs
+      - ./logs/httpd:/var/log/httpd                                              # Thư mục chứa log mặc định của apache ( mở nếu cần check )
+      # - ./logs/httpd:/data/log/www                                               # Thư mục chứa log custom
+
+      # conf,ini
+      - ./web/httpd/conf/httpd.conf:/etc/httpd/conf/httpd.conf
+      - ./web/httpd/conf.d/vhost.conf:/etc/httpd/conf.d/vhost.conf
+      - ./web/php/php.ini:/etc/php.ini
+    depends_on:
+      - db
+    tty: true
+  https-portal:
+    image: steveltn/https-portal:1
+    container_name: https_portal
+    ports:
+      - "80:80"
+      - "443:443"
+    tty: true
+    restart: always
+    volumes:
+      - ./https-portal/certs/:/var/lib/https-portal/
+    environment:
+      # Điều hướng domain
+      DOMAINS: 'quandayne.local -> http://web:8888'
+      STAGE: "local"
+      # STAGE: "staging"
+      # STAGE: "production"
+      # FORCE_RENEW: 'true'
+      # Thời gian kết nối
+      PROXY_CONNECT_TIMEOUT: 3600
+      # Thời gian tối đa cho những tác vụ dài như xuất CSV file
+      PROXY_SEND_TIMEOUT: 3600
+      # Thời gian tối đa cho những tác vụ đọc như debug
+      PROXY_READ_TIMEOUT: 3600
