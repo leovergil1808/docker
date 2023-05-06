@@ -26,7 +26,7 @@ services:
       - "8888:8888"
     volumes:
       # source
-      - ./htdocs/:/var/www/html                                                  # Thư mục chứ source mặc định của apache
+      - /htdocs/:/var/www/html                                                  # Thư mục chứ source mặc định của apache
       # - ./htdocs/:/data/mo2/www                                                  # Thư mục chứa source custom
 
       # logs
@@ -52,7 +52,7 @@ services:
       - ./https-portal/certs/:/var/lib/https-portal/
     environment:
       # Điều hướng domain
-      DOMAINS: 'quandayne.local -> http://web:8888'
+      DOMAINS: 'laravel10.lc -> http://web:8888, ismart.lc -> http://web:8888'
       STAGE: "local"
       # STAGE: "staging"
       # STAGE: "production"
