@@ -40,9 +40,9 @@ services:
     depends_on:
       - db
     tty: true
-  https-portal:
+  portal:
     image: steveltn/https-portal:1
-    container_name: https_portal
+    container_name: portal
     ports:
       - "80:80"
       - "443:443"
