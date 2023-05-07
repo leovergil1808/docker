@@ -57,6 +57,10 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN mv composer.phar /usr/local/bin/composer
 
+# Cài node 16
+RUN curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+RUN sudo yum install -y nodejs
+
 # Tạo và cấp quyền thư mục chứa source custom ( mẫu ko dc xóa )
 # RUN mkdir /data
 # RUN chmod 0777 data
